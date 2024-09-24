@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АС "Аноним"</title>
+    <link type="text/css" rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+</head>
+<body>
+    <div class="topnav">
+        <div class="brand">АС "Аноним"</div>
+        <div class="nav-links">
+            <a href="#">Главная</a>
+            <a href="#">Помощь</a>
+            <a href="#">Авторы</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="title">АС "Аноним"</h1>
+        <form id="textForm" action="" method="post" enctype="multipart/form-data">
+            <label for="exampleText">Пример текста:</label>
+            <textarea id="exampleText" name="exampleText" rows="5" cols="50" required></textarea>
+			<label for="fileInput">Текста, которые необходимо сравнить с примером:</label>
+            <input type="file" id="fileInput" name="files" accept=".txt" multiple required>
+            <button type="submit">Отправить</button>
+        </form>
+        {% if result %}
+        <div id="outputArea">
+            <p>Относительно примера:</p>
+            {% for key, value in result.items() %}
+            <p>{{key}} - {{value * 25}} %</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
