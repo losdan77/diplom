@@ -79,3 +79,15 @@ button {
     border: 1px solid #ccc;
     padding: 10px;
 }
+
+.result_ok {
+    background-color: rgba(0, 255, 0, 0.5);
+}
+
+.result_no {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.result_mb {
+    background-color: rgba(255, 255, 0, 0.5);
+}

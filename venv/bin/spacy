@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/home/los/Рабочий стол/flask_diplom/venv/bin/python3" "$0" "$@"
+'''exec' "/home/los/Рабочий стол/Диплом/flask_diplom/venv/bin/python3" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
