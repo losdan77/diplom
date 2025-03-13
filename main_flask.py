@@ -45,65 +45,7 @@ admin = Admin(app, name='Anonim', template_mode='bootstrap3')
 admin.add_view(ModelView(Authors, db.session))
 
 
-@app.route("/", methods=["POST", "GET"])
-def index():
-
-    texts = []
-    sum_stat = 0
-
-    if request.method == 'POST':
-
-        example_text = request.form.get('exampleText')
-        example_text = ' '.join(example_text.splitlines())
-        texts.append(example_text)
-
-        text_from_file = request.files.getlist('files')
-
-        for text in text_from_file:
-            clear_text = ' '.join(text.read().decode().splitlines())
-            texts.append(clear_text)
-
-
-        sentence_tokenizer = nltk.data.load('tokenizers/punkt/russian.pickle')
-        word_tokenizer = nltk.tokenize.RegexpTokenizer(r'\w+')
-        file_counts = len(fnmatch.filter(os.listdir('./texts'), '*.txt'))
-
-        fvs_lexical = np.zeros((len(texts), 3), np.float64)
-        fvs_punct = np.zeros((len(texts), 3), np.float64)
-        fvs_avg_MTLD = np.zeros((len(texts), 1), np.float64)
-
-        method_avg_MTLD(texts, fvs_avg_MTLD, sum_stat)
-        methods_punctuation_and_lexical(texts,
-                                        sentence_tokenizer,
-                                        word_tokenizer,
-                                        fvs_lexical,
-                                        fvs_punct)
-        print('avg_ntld', fvs_avg_MTLD)
-        print('lexical',fvs_lexical)
-        print('punct',fvs_punct)
-
-        result = print_result(fvs_lexical,
-                                fvs_punct,
-                                fvs_avg_MTLD,
-                                method_syntax(texts))
-
-        result_dict = {}
-
-        for text, res in zip(text_from_file, result[1:]):
-            result_dict[f'{text.filename}'] = res
-
-        return render_template("index.html",
-                               result=result_dict)
-
-    return render_template("index.html", result=result_dict)
-
-
-@app.route('/help')
-def help_page():
-    return render_template('help.html')
-
-
-@app.route('/find_author', methods=["POST", "GET"])
+@app.route('/', methods=["POST", "GET"])
 def find_author():
     
     texts = []
@@ -118,14 +60,13 @@ def find_author():
         text_from_authors = Authors.query.all()
         
         for text in text_from_authors:
-            print('---', text)
             clear_text = ' '.join(text.example_text.splitlines())
             texts.append(clear_text)
 
-        print(str(texts))
+        # print(str(texts))
         sentence_tokenizer = nltk.data.load('tokenizers/punkt/russian.pickle')
         word_tokenizer = nltk.tokenize.RegexpTokenizer(r'\w+')
-        file_counts = len(fnmatch.filter(os.listdir('./texts'), '*.txt'))
+        # file_counts = len(fnmatch.filter(os.listdir('./texts'), '*.txt'))
 
         fvs_lexical = np.zeros((len(texts), 3), np.float64)
         fvs_punct = np.zeros((len(texts), 3), np.float64)
@@ -154,6 +95,71 @@ def find_author():
         return render_template("find_author.html",
                                result=result_dict)
     return render_template('find_author.html')
+
+
+@app.route("/compare_texts", methods=["POST", "GET"])
+def compare_texts():
+
+    texts = []
+    sum_stat = 0
+
+    if request.method == 'POST':
+
+        example_text = request.form.get('exampleText')
+        example_text = ' '.join(example_text.splitlines())
+        texts.append(example_text)
+
+        text_from_file = request.files.getlist('files')
+
+        for text in text_from_file:
+            clear_text = ' '.join(text.read().decode().splitlines())
+            texts.append(clear_text)
+
+        text_from_authors = Authors.query.all()
+        
+        for text in text_from_authors:
+            clear_text = ' '.join(text.example_text.splitlines())
+            texts.append(clear_text)
+
+        sentence_tokenizer = nltk.data.load('tokenizers/punkt/russian.pickle')
+        word_tokenizer = nltk.tokenize.RegexpTokenizer(r'\w+')
+        file_counts = len(fnmatch.filter(os.listdir('./texts'), '*.txt'))
+
+        fvs_lexical = np.zeros((len(texts), 3), np.float64)
+        fvs_punct = np.zeros((len(texts), 3), np.float64)
+        fvs_avg_MTLD = np.zeros((len(texts), 1), np.float64)
+
+        method_avg_MTLD(texts, fvs_avg_MTLD, sum_stat)
+        methods_punctuation_and_lexical(texts,
+                                        sentence_tokenizer,
+                                        word_tokenizer,
+                                        fvs_lexical,
+                                        fvs_punct)
+        print('avg_ntld', fvs_avg_MTLD)
+        print('lexical',fvs_lexical)
+        print('punct',fvs_punct)
+
+        result = print_result(fvs_lexical,
+                                fvs_punct,
+                                fvs_avg_MTLD,
+                                method_syntax(texts))
+
+        result_dict = {}
+        # print('---', result)
+        # print('---', list(zip(text_from_file, result[1:])))
+        
+        for text, res in zip(text_from_file, result[1:]):
+            result_dict[f'{text.filename}'] = res
+
+        return render_template("compare_texts.html",
+                               result=result_dict)
+
+    return render_template("compare_texts.html")
+
+
+@app.route('/help')
+def help_page():
+    return render_template('help.html')
 
 
 def token_to_pos(ch):
@@ -241,14 +247,14 @@ def print_result(fvs_lexical,
     zip_mass = list(zip(mass1, mass2, mass3, mass4))
 
     for sum_mass in zip_mass:
-        if sum(sum_mass) > 2:
+        if sum_mass.count(1) > 2:
             result_word = 'да'
-        elif sum(sum_mass) < 2:
+        elif sum_mass.count(1) < 2:
             result_word = 'нет'
-        elif sum(sum_mass) == 2:
+        elif sum_mass.count(1) == 2:
             result_word = 'возможно'
 
-        result_mass.append([sum(sum_mass), result_word])
+        result_mass.append([sum_mass.count(1), result_word])
 
 
     return result_mass
