@@ -29,16 +29,16 @@ app.secret_key = os.urandom(24)
 class Authors(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(50), nullable = True)
-    example_text = db.Column(db.String(500), nullable = True)
+    example_text = db.Column(db.String(), nullable = True)
 
     def __str__(self):
         return f'{[self.name, self.example_text]}'
 
 
-# with app.app_context():
-#     db.create_all()
-#     db.session.add(Authors(name="example", example_text='123'))
-#     db.session.commit()
+with app.app_context():
+    db.create_all()
+    db.session.add(Authors(name="example", example_text='123'))
+    db.session.commit()
 
 
 admin = Admin(app, name='Anonim', template_mode='bootstrap3')
@@ -85,7 +85,8 @@ def find_author():
         result = print_result(fvs_lexical,
                                 fvs_punct,
                                 fvs_avg_MTLD,
-                                method_syntax(texts))
+                                method_syntax(texts),
+                                8)
 
         result_dict = {}
 
@@ -142,7 +143,8 @@ def compare_texts():
         result = print_result(fvs_lexical,
                                 fvs_punct,
                                 fvs_avg_MTLD,
-                                method_syntax(texts))
+                                method_syntax(texts),
+                                4)
 
         result_dict = {}
         # print('---', result)
@@ -228,12 +230,13 @@ def reduce_mass(mass):
 def print_result(fvs_lexical,
                  fvs_punct,
                  fvs_avg_MTLD,
-                 fvs_syntax):
+                 fvs_syntax,
+                 num_klusters):
 
     result_mass = []
 
     #Функция выводит результаты кластеризируя их по к-среднему
-    km = KMeans(n_clusters=2, init='k-means++', n_init=10, verbose=0)
+    km = KMeans(n_clusters=num_klusters, init='k-means++', n_init=10, verbose=0)
 
     mass1 = reduce_mass(km.fit_predict(fvs_lexical))
     print('fit_lexical=', mass1)
@@ -255,7 +258,6 @@ def print_result(fvs_lexical,
             result_word = 'возможно'
 
         result_mass.append([sum_mass.count(1), result_word])
-
 
     return result_mass
 

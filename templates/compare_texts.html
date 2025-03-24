@@ -2,6 +2,7 @@
 
 {% block body %}
     <h1 class="title">АС "Аноним"</h1>
+    <h2 class="title">Сравнение текстов с примером</h2>
     <form id="textForm" action="" method="post" enctype="multipart/form-data">
         <label for="exampleText">Пример текста:</label>
         <textarea id="exampleText" name="exampleText" rows="5" cols="50" required></textarea>
@@ -14,13 +15,13 @@
         <p>Относительно примера:</p>
         {% for key, value in result.items() %}
             {% if value[0] > 2 %}
-                <p class="result_ok">{{key}} - {{value[0] * 25}} % - {{value[1]}}</p>
+                <p class="result_ok">{{key}} - {{value[1]}}</p>
             {% endif %}
             {% if value[0] < 2 %}
-                <p class="result_no">{{key}} - {{value[0] * 25}} % - {{value[1]}}</p>
+                <p class="result_no">{{key}} - {{value[1]}}</p>
             {% endif %}
             {% if value[0] == 2 %}
-                <p class="result_mb">{{key}} - {{value[0] * 25}} % - {{value[1]}}</p>
+                <p class="result_mb">{{key}} - {{value[1]}}</p>
             {% endif %}
         {% endfor %}
     </div>
